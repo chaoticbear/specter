@@ -8,6 +8,6 @@
             "email": "christopher.studer@gmail.com"
         }
     ],
-    "minimum-stability": "dev",
+    "minimum-stability": "stable",
     "require": {}
 }
