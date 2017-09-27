@@ -1,7 +1,7 @@
 <?php
 namespace Specter;
 
-abstract class SoulView
+abstract class View
 {
     static function read($file='', $vars='')
     {
