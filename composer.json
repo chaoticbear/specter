@@ -1,0 +1,13 @@
+{
+    "name": "christopherstuder/specter",
+    "description": "Simple PHP MVC",
+    "type": "framework",
+    "authors": [
+        {
+            "name": "Christopher Studer",
+            "email": "christopher.studer@gmail.com"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {}
+}
