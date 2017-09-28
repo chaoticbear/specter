@@ -10,7 +10,8 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "php" : ">=5.3.0"
+        "php" : ">=5.3.0",
+        "nikic/fast-route": "dev-master"
     },
     "autoload": {
         "psr-4": {
