@@ -12,12 +12,4 @@ abstract class View
         require(VIEW_PATH . $file);
         return ob_get_clean();
     }
-
-    static function render($file='', $vars='')
-    {
-        if (is_array($vars)) {
-            extract($vars);
-        }
-        require(VIEW_PATH . $file);
-    }
 }

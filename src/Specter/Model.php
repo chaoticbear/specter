@@ -5,10 +5,4 @@ namespace Specter;
 // https://phpdelusions.net/pdo/objects
 abstract class Model
 {
-    protected $pkname;
-    protected $tablename;
-    protected $dbhfnname;
-    protected $QUOTE_STYLE='MYSQL'; // valid types are MYSQL,MSSQL,ANSI
-    protected $COMPRESS_ARRAY=true;
-    public $rs = array(); // for holding all object property variables
 }
