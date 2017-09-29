@@ -1,7 +1,7 @@
 <?php
 namespace Specter;
 
-abstract class App
+class App
 {
     protected $settings = [];
 
