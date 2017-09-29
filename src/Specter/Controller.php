@@ -2,7 +2,7 @@
 namespace Specter;
 
 use Specter\App;
-use Specter\View;
+use App\View;
 
 abstract class Controller
 {
