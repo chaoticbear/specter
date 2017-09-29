@@ -13,8 +13,8 @@ abstract class Controller
         $this->app = $app;
     }
 
-    protected function render($view, array $vars = []) {
+    protected function render($file, array $vars = []) {
         $view = new View($this->app);
-        return $view->read($view, $vars);
+        return $view->read($file, $vars);
     }
 }
