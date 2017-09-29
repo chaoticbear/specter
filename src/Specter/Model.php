@@ -5,4 +5,10 @@ namespace Specter;
 // https://phpdelusions.net/pdo/objects
 abstract class Model
 {
+    protected $app;
+
+    public function __construct(App $app)
+    {
+        $this->app = $app;
+    }
 }
