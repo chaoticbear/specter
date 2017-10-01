@@ -2,9 +2,9 @@
 namespace Specter;
 
 use Specter\App;
-use App\View;
+use Specter\View;
 
-abstract class Controller
+class Controller
 {
     protected $app;
 

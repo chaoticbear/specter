@@ -3,13 +3,15 @@ namespace Specter;
 
 use Specter\App;
 
-abstract class View
+class View
 {
     protected $app;
+    protected $viewPath;
 
     public function __construct(App $app)
     {
         $this->app = $app;
+        $this->viewPath = $this->app->get('viewPath');
     }
 
     public function read($file='', $vars='')
@@ -18,7 +20,7 @@ abstract class View
             extract($vars);
         }
         ob_start();
-        require($this->app->get('viewPath') . $file);
+        require($this->viewPath . $file);
         return ob_get_clean();
     }
 }
