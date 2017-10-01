@@ -22,6 +22,13 @@ class App
         if (!isset($this->settings['webBase'])) {
             $this->settings['webBase'] = '/';
         }
+        if (!isset($this->settings['db'])) {
+            $this->settings['db'] = [
+                'dsn' => 'mysql:host=localhost;dbname=specter',
+                'user' => 'specter',
+                'pass' => 'haunt',
+            ];
+        }
     }
 
     public function get($name)
