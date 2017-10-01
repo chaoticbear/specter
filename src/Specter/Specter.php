@@ -87,10 +87,12 @@ class Specter
     }
 
     protected function page404()
+    {
         $this->errorPage('404');
     }
 
     protected function page405()
+    {
         $this->errorPage('405');
     }
 
