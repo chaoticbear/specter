@@ -86,11 +86,11 @@ class Specter
 
     }
 
-    protected function 404Page()
+    protected function page404()
         $this->errorPage('404');
     }
 
-    protected function 405Page()
+    protected function page405()
         $this->errorPage('405');
     }
 
@@ -119,10 +119,10 @@ class Specter
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
         case FastRoute\Dispatcher::NOT_FOUND:
-            $this->404Page();
+            $this->page404();
             break;
         case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-            $this->405Page();
+            $this->page405();
             break;
         case FastRoute\Dispatcher::FOUND:
             $handler = $routeInfo[1];
@@ -139,7 +139,7 @@ class Specter
                 $controller = new $class($this, $params);
                 echo $controller->$method();
             } else {
-                $this->404Page();
+                $this->page404();
             }
             break;
         }
