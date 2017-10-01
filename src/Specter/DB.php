@@ -1,11 +1,26 @@
 <?php
 namespace Specter;
 
+use Specter\Specter;
 use \PDO;
 
 class DB
 {
+    protected $specter;
     protected $cons = [];
+
+    public function __construct(Specter $specter)
+    {
+        $this->specter = $specter;
+        $this->settings($specter->get('dbs'));
+    }
+
+    public function settings($dbs = [])
+    {
+        foreach($dbs as $dbName => $dbConf) {
+            $this->add($dbName, $dbConf['dsn'], $dbConf['user'], $dbConf['pass']);
+        }
+    }
 
     public function add($dbName, $dsn, $user = null, $pass = null)
     {

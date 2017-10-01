@@ -1,17 +1,17 @@
 <?php
 namespace Specter;
 
-use Specter\App;
+use Specter\Specter;
 
 class View
 {
-    protected $app;
+    protected $specter;
     protected $viewPath;
 
-    public function __construct(App $app)
+    public function __construct(Specter $specter)
     {
-        $this->app = $app;
-        $this->viewPath = $this->app->get('viewPath');
+        $this->specter = $specter;
+        $this->viewPath = $specter->get('viewPath');
     }
 
     public function read($file='', $vars='')

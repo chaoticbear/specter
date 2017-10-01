@@ -5,10 +5,10 @@ namespace Specter;
 // https://phpdelusions.net/pdo/objects
 class Model
 {
-    protected $app;
+    protected $specter;
 
-    public function __construct(App $app)
+    public function __construct(Specter $specter)
     {
-        $this->app = $app;
+        $this->specter = $specter;
     }
 }

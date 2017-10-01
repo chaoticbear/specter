@@ -1,20 +1,20 @@
 <?php
 namespace Specter;
 
-use Specter\App;
+use Specter\Specter;
 use Specter\View;
 
 class Controller
 {
-    protected $app;
+    protected $specter;
 
-    public function __construct(App $app)
+    public function __construct(Specter $specter)
     {
-        $this->app = $app;
+        $this->specter = $specter;
     }
 
     protected function render($file, array $vars = []) {
-        $view = new View($this->app);
+        $view = new View($this->specter);
         return $view->read($file, $vars);
     }
 }

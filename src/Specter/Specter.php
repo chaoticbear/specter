@@ -1,7 +1,7 @@
 <?php
 namespace Specter;
 
-class App
+class Specter;
 {
     protected $settings = [];
 
@@ -22,11 +22,13 @@ class App
         if (!isset($this->settings['webBase'])) {
             $this->settings['webBase'] = '/';
         }
-        if (!isset($this->settings['db'])) {
-            $this->settings['db'] = [
-                'dsn' => 'mysql:host=localhost;dbname=specter',
-                'user' => 'specter',
-                'pass' => 'haunt',
+        if (!isset($this->settings['dbs'])) {
+            $this->settings['dbs'] = [
+                'db' => [
+                    'dsn' => 'mysql:host=localhost;dbname=specter',
+                    'user' => 'specter',
+                    'pass' => 'haunt',
+                ]
             ];
         }
     }
