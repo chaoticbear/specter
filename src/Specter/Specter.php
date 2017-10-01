@@ -107,17 +107,12 @@ class Specter
     {
         //TODO cache this.
         $dispatcher = \FastRoute\simpleDispatcher($this->routes());
-
-        // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
         $uri = $_SERVER['REQUEST_URI'];
-
-        // Strip query string (?foo=bar) and decode URI
         if (false !== $pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
         }
         $uri = rawurldecode($uri);
-
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
         case \FastRoute\Dispatcher::NOT_FOUND:
@@ -153,6 +148,7 @@ class Specter
         $this->db = new DB($this);
         $this->route();
         /*
+        TODO make custom error pages in view to handle this.
         set_exception_handler('uncaught_exception_handler');
         function uncaught_exception_handler($e) {
           ob_end_clean(); //dump out remaining buffered text
