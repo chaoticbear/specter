@@ -106,7 +106,7 @@ class Specter
     protected function route()
     {
         //TODO cache this.
-        $dispatcher = FastRoute\simpleDispatcher($this->routes());
+        $dispatcher = \FastRoute\simpleDispatcher($this->routes());
 
         // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -120,13 +120,13 @@ class Specter
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
-        case FastRoute\Dispatcher::NOT_FOUND:
+        case \FastRoute\Dispatcher::NOT_FOUND:
             $this->page404();
             break;
-        case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+        case \FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
             $this->page405();
             break;
-        case FastRoute\Dispatcher::FOUND:
+        case \FastRoute\Dispatcher::FOUND:
             $handler = $routeInfo[1];
             $params = $routeInfo[2];
             $parts = explode('@', $handler);
