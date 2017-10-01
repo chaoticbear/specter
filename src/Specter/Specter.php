@@ -1,6 +1,7 @@
 <?php
 namespace Specter;
 
+use Dotenv\Dotenv;
 use Specter\View;
 use Specter\DB;
 
@@ -15,12 +16,16 @@ class Specter
             $this->settings = $settings;
         } else {
             $configPaths = [
-                'config.php',
-                '../config.php',
+                './',
+                '../',
             ];
             foreach ($configPaths as $path) {
-                if (is_file($path)) {
-                    $this->settings = include $path;
+                $file = $path . 'config.php';
+                if (is_file($file)) {
+                    $dotenv = new Dotenv($path);
+                    $dotenv->overload();
+                    $this->settings = include $file;
+                    $dotenv = null;
                     break;
                 }
             }
