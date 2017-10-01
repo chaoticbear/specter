@@ -8,6 +8,7 @@ use Specter\DB;
 class Specter
 {
     protected $settings = [];
+    protected $db;
 
     public function __construct(array $settings = [])
     {
@@ -25,6 +26,7 @@ class Specter
                     $dotenv = new Dotenv($path);
                     $dotenv->overload();
                     $this->settings = include $file;
+                    $this->settings['configFile'] = $file;
                     $dotenv = null;
                     break;
                 }
@@ -43,9 +45,6 @@ class Specter
         }
         if (!isset($this->settings['webBase'])) {
             $this->settings['webBase'] = '/';
-        }
-        if (!isset($this->settings['configPath'])) {
-            $this->settings['configPath'] = '../config.php';
         }
         if (!isset($this->settings['dbs'])) {
             $this->settings['dbs'] = [
@@ -72,18 +71,40 @@ class Specter
         $this->settings[$name] = $value;
     }
 
-    public function haunt()
+    protected function routes()
     {
-        session_start();
-        $db = new DB($this);
-        $pdo = $db->pdo();
-        foreach($pdo->query('SELECT * FROM dataSrc') as $row) {
-            print_r($row);
+        $paths = [
+            './',
+            '../',
+        ];
+        foreach ($paths as $path) {
+            $file = $path . 'routes.php';
+            if (is_file($file)) {
+                return include $file;
+            }
         }
 
-        $dispatcher = FastRoute\simpleDispatcher(function(FastRoute\RouteCollector $r) {
-            $r->addRoute('GET', '/', 'Main@index');
-        });
+    }
+
+    protected function 404Page()
+        $this->errorPage('404');
+    }
+
+    protected function 405Page()
+        $this->errorPage('405');
+    }
+
+    private function errorPage($type = '404')
+    {
+        http_response_code($type);
+        $view = new View($this);
+        die($view->read($type.'.php'));
+    }
+
+    protected function route()
+    {
+        //TODO cache this.
+        $dispatcher = FastRoute\simpleDispatcher($this->routes());
 
         // Fetch method and URI from somewhere
         $httpMethod = $_SERVER['REQUEST_METHOD'];
@@ -97,25 +118,38 @@ class Specter
 
         $routeInfo = $dispatcher->dispatch($httpMethod, $uri);
         switch ($routeInfo[0]) {
-            case FastRoute\Dispatcher::NOT_FOUND:
-                http_response_code(404);
-                $view = new View($this);
-                echo $view->read('404.php');
-                break;
-            case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
-                $allowedMethods = $routeInfo[1];
-                http_response_code(405);
-                $view = new View($this);
-                echo $view->read('405.php');
-                break;
-            case FastRoute\Dispatcher::FOUND:
-                $handler = $routeInfo[1];
-                $vars = $routeInfo[2];
-                $controller = new \App\Controllers\Main($this);
-                echo $controller->index();
-                break;
+        case FastRoute\Dispatcher::NOT_FOUND:
+            $this->404Page();
+            break;
+        case FastRoute\Dispatcher::METHOD_NOT_ALLOWED:
+            $this->405Page();
+            break;
+        case FastRoute\Dispatcher::FOUND:
+            $handler = $routeInfo[1];
+            $params = $routeInfo[2];
+            $parts = explode('@', $handler);
+            if(
+                isset($parts[0])
+                && isset($parts[1])
+                && class_exists('\\App\\Controllers\\' . $parts[0])
+                && method_exists('\\App\\Controllers\\' . $parts[0], $parts[1])
+            ) {
+                $class = '\\App\\Controllers\\' . $parts[0];
+                $method = $parts[1];
+                $controller = new $class($this, $params);
+                echo $controller->$method();
+            } else {
+                $this->404Page();
+            }
+            break;
         }
+    }
 
+    public function haunt()
+    {
+        session_start();
+        $this->db = new DB($this);
+        $this->route();
         /*
         set_exception_handler('uncaught_exception_handler');
         function uncaught_exception_handler($e) {
