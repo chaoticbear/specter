@@ -34,14 +34,14 @@ abstract class Model
     public static function one($id)
     {
         $stm = $this->db->prepare('SELECT * FROM ? WHERE ? = ?');
-        $stm->execute([$this->tbl, $this->pk, $id]);
+        $stm->execute([self::tbl, self::pk, $id]);
         return $stm->fetchObject(get_class($this));
     }
 
     public static function del($id)
     {
         $stm = $this->db->prepare('DELETE FROM ? WHERE ? = ?');
-        $stm->execute([$this->tbl, $this->pk, $id]);
+        $stm->execute([self::tbl, self::pk, $id]);
         return $stm->rowCount();
     }
 
