@@ -4,7 +4,7 @@ namespace Specter;
 use Specter\Specter;
 use Specter\View;
 
-class Controller
+abstract class Controller
 {
     protected $specter;
     protected $params = [];
