@@ -37,7 +37,7 @@ abstract class Model
     {
         $stm = $this->db->prepare('SELECT * FROM ? WHERE ? = ?');
         $stm->execute([$this->tbl, $this->pk, $id]);
-        return $stm->fetchObject(get_class($this), $this->specter);
+        return $stm->fetchObject(get_class($this), [$this->specter]);
     }
 
     public function delete($id = null)
