@@ -5,22 +5,23 @@ use Specter\DB;
 
 abstract class Model
 {
-    protected $con = 'db';
+    protected static $con = 'db';
     protected $db;
-    protected $tbl;
-    protected $pk = 'id';
+    protected static $tbl;
+    protected static $pk = 'id';
     protected $mods = [];
     protected $rs = [];
 
     public function __construct()
     {
-        $this->db = DB::pdo($this->con);
+        $this->db = DB::pdo(self::con);
         $this->mods = [];
     }
 
-    protected function quote($str)
+    protected static function quote($str)
     {
-        switch($this->db->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        $db = DB::pdo(self::con);
+        switch($db->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
             case 'sqlsql':
             case 'mssql':
             case 'dblib':
@@ -57,24 +58,28 @@ abstract class Model
         return $this->set($key, $val);
     }
 
-    public function one($id)
+    public static function one($id)
     {
-        $stm = $this->db->prepare('SELECT * FROM ' . $this->quote($this->tbl) .
-            ' WHERE ' . $this->quote($this->pk) . ' = ?');
+        $db = DB::pdo(self::con);
+        $stm = $db->prepare('SELECT * FROM ' . self::quote(self::tbl) .
+            ' WHERE ' . self::quote(self::pk) . ' = ?');
         $stm->execute([$id]);
         return $stm->fetchObject(get_class($this));
     }
 
-    public function delete($id = null)
+    public static function del($id)
     {
-        if ($id === null) {
-            $pk = $this->pk;
-            $id = $this->$pk;
-        }
-        $stm = $this->db->prepare('DELETE FROM ' . $this->quote($this->tbl) .
-            ' WHERE '. $this->quote($this->pk) . ' = ?');
+        $db = DB::pdo(self::con);
+        $stm = $db->prepare('DELETE FROM ' . self::quote(self::tbl) .
+            ' WHERE '. self::quote(self::pk) . ' = ?');
         $stm->execute([$id]);
         return $stm->rowCount();
+    }
+
+    public function delete()
+    {
+        $pk = self::pk;
+        return self::del($this->$pk);
     }
 
     public function save()
@@ -82,16 +87,16 @@ abstract class Model
         if (!empty($this->mods)) {
             $s = '';
             foreach ($this->mods as $k => $v) {
-                $s .= ',' . $this->quote($k) . '=?';
+                $s .= ',' . self::quote($k) . '=?';
             }
             $s = substr($s,1);
-            $s = 'UPDATE ' . $this->quote($this->tbl) . ' SET ' . $s .
-                ' WHERE ' . $this->quote($this->pk) . ' = ?';
+            $s = 'UPDATE ' . self::quote(self::tbl) . ' SET ' . $s .
+                ' WHERE ' . self::quote(self::pk) . ' = ?';
             $p = [];
             foreach ($this->mods as $k => $v) {
                 $p[] = $v;
             }
-            $pk = $this->pk;
+            $pk = self::pk;
             $p[] = $this->$pk;
             $stm = $this->db->prepare($s);
             $stm->execute($p);
