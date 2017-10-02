@@ -8,7 +8,7 @@ use Specter\DB;
 class Specter
 {
     protected $settings = [];
-    protected $db;
+    public $db;
 
     public function __construct(array $settings = [])
     {
