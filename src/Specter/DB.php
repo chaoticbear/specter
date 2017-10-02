@@ -6,6 +6,7 @@ use \PDO;
 
 class DB
 {
+    protected $prefix = 'specter_dbh_';
     protected $specter;
     protected $cons = [];
 
@@ -29,18 +30,17 @@ class DB
             'user'=>$user,
             'pass'=> $pass
         ];
-    }
-
-    public function pdo($dbName = 'db')
-    {
-        $prefix = 'specter_dbh_';
-        if (!isset($GLOBALS[$prefix.$dbName])) {
-            $GLOBALS[$prefix.$dbName] = new PDO(
+        if (!isset($GLOBALS[$this->prefix.$dbName])) {
+            $GLOBALS[$this->prefix.$dbName] = new PDO(
                 $this->cons[$dbName]['dsn'],
                 $this->cons[$dbName]['user'],
                 $this->cons[$dbName]['pass']
             );
         }
-        return $GLOBALS[$prefix.$dbName];
+    }
+
+    public static function pdo($dbName = 'db')
+    {
+        return $GLOBALS[self::$prefix.$dbName];
     }
 }

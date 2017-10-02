@@ -3,12 +3,8 @@ namespace Specter;
 
 use Specter\DB;
 
-//TODO this will become something simpler using only PDO
-// https://phpdelusions.net/pdo/objects
 abstract class Model
 {
-    protected $specter;
-
     protected $con = 'db';
     protected $db;
     protected $tbl;
@@ -16,10 +12,9 @@ abstract class Model
     protected $mods = [];
     protected $rs = [];
 
-    public function __construct(Specter $specter)
+    public function __construct()
     {
-        $this->specter = $specter;
-        $this->db = $specter->db->pdo($this->con);
+        $this->db = DB::pdo($this->con);
         $this->mods = [];
     }
 
@@ -67,7 +62,7 @@ abstract class Model
         $stm = $this->db->prepare('SELECT * FROM ' . $this->quote($this->tbl) .
             ' WHERE ' . $this->quote($this->pk) . ' = ?');
         $stm->execute([$id]);
-        return $stm->fetchObject(get_class($this), [$this->specter]);
+        return $stm->fetchObject(get_class($this));
     }
 
     public function delete($id = null)
