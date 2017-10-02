@@ -14,13 +14,13 @@ abstract class Model
 
     public function __construct()
     {
-        $this->db = DB::pdo(self::con);
+        $this->db = DB::pdo(static::$con);
         $this->mods = [];
     }
 
     protected static function quote($str)
     {
-        $db = DB::pdo(self::con);
+        $db = DB::pdo(static::$con);
         switch($db->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
             case 'sqlsql':
             case 'mssql':
@@ -60,26 +60,26 @@ abstract class Model
 
     public static function one($id)
     {
-        $db = DB::pdo(self::con);
-        $stm = $db->prepare('SELECT * FROM ' . self::quote(self::tbl) .
-            ' WHERE ' . self::quote(self::pk) . ' = ?');
+        $db = DB::pdo(static::$con);
+        $stm = $db->prepare('SELECT * FROM ' . static::quote(static::$tbl) .
+            ' WHERE ' . static::quote(static::$pk) . ' = ?');
         $stm->execute([$id]);
-        return $stm->fetchObject(get_class($this));
+        return $stm->fetchObject(static::class);
     }
 
     public static function del($id)
     {
-        $db = DB::pdo(self::con);
-        $stm = $db->prepare('DELETE FROM ' . self::quote(self::tbl) .
-            ' WHERE '. self::quote(self::pk) . ' = ?');
+        $db = DB::pdo(static::$con);
+        $stm = $db->prepare('DELETE FROM ' . static::quote(static::$tbl) .
+            ' WHERE '. static::quote(static::$pk) . ' = ?');
         $stm->execute([$id]);
         return $stm->rowCount();
     }
 
     public function delete()
     {
-        $pk = self::pk;
-        return self::del($this->$pk);
+        $pk = static::$pk;
+        return static::del($this->$pk);
     }
 
     public function save()
@@ -87,16 +87,16 @@ abstract class Model
         if (!empty($this->mods)) {
             $s = '';
             foreach ($this->mods as $k => $v) {
-                $s .= ',' . self::quote($k) . '=?';
+                $s .= ',' . static::quote($k) . '=?';
             }
             $s = substr($s,1);
-            $s = 'UPDATE ' . self::quote(self::tbl) . ' SET ' . $s .
-                ' WHERE ' . self::quote(self::pk) . ' = ?';
+            $s = 'UPDATE ' . static::quote(static::$tbl) . ' SET ' . $s .
+                ' WHERE ' . static::quote(static::$pk) . ' = ?';
             $p = [];
             foreach ($this->mods as $k => $v) {
                 $p[] = $v;
             }
-            $pk = self::pk;
+            $pk = static::$pk;
             $p[] = $this->$pk;
             $stm = $this->db->prepare($s);
             $stm->execute($p);
