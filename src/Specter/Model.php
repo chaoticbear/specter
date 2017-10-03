@@ -42,10 +42,23 @@ abstract class Model
 
     public static function cols()
     {
-        foreach (static::pdo(static::$con)
+        $r = [];
+        foreach (DB::pdo(static::$con)
             ->query('SHOW COLUMNS FROM ' . static::tbl()) as $rw) {
-            var_dump($rw);
+            $r[] = ['name'=>$rw['Field']];
         }
+        return $r;
+    }
+
+    public static function new()
+    {
+        $class = static::class;
+        $r = new $class;
+        $cols = static::cols();
+        foreach($cols as $col) {
+            $r->set($col['name'], null);
+        }
+        return $r;
     }
 
     public static function one($id)
@@ -102,26 +115,50 @@ abstract class Model
 
     public function save()
     {
+        $r = 0;
         if (!empty($this->mods)) {
-            $s = '';
-            foreach ($this->mods as $k => $v) {
-                $s .= ',' . static::quote($k) . '=?';
-            }
-            $s = substr($s,1);
-            $s = 'UPDATE ' . static::tbl() . ' SET ' . $s . ' WHERE ' .
-                static::pk() . ' = ?';
-            $p = [];
-            foreach ($this->mods as $k => $v) {
-                $p[] = $v;
-            }
             $pk = static::$pk;
-            $p[] = $this->$pk;
-            $stm = $this->db->prepare($s);
-            $stm->execute($p);
-            $this->mods = [];
-            return $stm->rowCount();
+            $s = '';
+            $id = 0;
+            if ($this->$pk === null) {
+                $s2 = '';
+                $p = [];
+                foreach ($this->mods as $k => $v) {
+                    if ($this->$pk !== $k) {
+                        $s .= ',' . static::quote($k);
+                        $s2 .= ',?';
+                        $p[] = $v;
+                    }
+                }
+                $s = 'INSERT INTO ' . static::tbl() . ' (' . substr($s,1) .
+                    ') VALUES (' . substr($s2,1) . ')';
+                $stm = $this->db->prepare($s);
+                $stm->execute($p);
+                $id = $this->db->lastInsertId();
+                $r = $id;
+            } else {
+                $p = [];
+                foreach ($this->mods as $k => $v) {
+                    $s .= ',' . static::quote($k) . '=?';
+                    $p[] = $v;
+                }
+                $s = substr($s,1);
+                $s = 'UPDATE ' . static::tbl() . ' SET ' . $s . ' WHERE ' .
+                    static::pk() . ' = ?';
+                $id = $this->$pk;
+                $p[] = $this->$pk;
+                $stm = $this->db->prepare($s);
+                $stm->execute($p);
+                $r = $stm->rowCount();
+            }
+            $s = 'SELECT * FROM ' . static::tbl() . ' WHERE ' . static::pk() .
+                ' = ?';
+            $st = $this->db->prepare($s);
+            $st->setFetchMode( \PDO::FETCH_INTO, $this);
+            $st->execute([$id]);
+            $st->fetch(\PDO::FETCH_INTO);
         }
         $this->mods = [];
-        return 0;
+        return $r;
     }
 }
