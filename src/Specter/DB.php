@@ -6,7 +6,8 @@ use \PDO;
 
 class DB
 {
-    const PREFIX = 'specter_dbh_';
+    const DB_PREFIX = 'specter_db_pdo_';
+    const TYPE_PREFIX = 'specter_db_type_';
     protected $specter;
     protected $cons = [];
 
@@ -30,17 +31,25 @@ class DB
             'user'=>$user,
             'pass'=> $pass
         ];
-        if (!isset($GLOBALS[self::PREFIX.$dbName])) {
-            $GLOBALS[self::PREFIX.$dbName] = new PDO(
+        if (!isset($GLOBALS[self::DB_PREFIX.$dbName])) {
+            $GLOBALS[self::DB_PREFIX.$dbName] = new PDO(
                 $this->cons[$dbName]['dsn'],
                 $this->cons[$dbName]['user'],
                 $this->cons[$dbName]['pass']
             );
+            $GLOBALS[self::TYPE_PREFIX.$dbName] =
+                $GLOBALS[self::DB_PREFIX.$dbName]
+                    ->getAttribute(\PDO::ATTR_DRIVER_NAME);
         }
     }
 
     public static function pdo($dbName = 'db')
     {
-        return $GLOBALS[self::PREFIX.$dbName];
+        return $GLOBALS[self::DB_PREFIX.$dbName];
+    }
+
+    public static function type($dbName = 'db')
+    {
+        return $GLOBALS[self::TYPE_PREFIX.$dbName];
     }
 }

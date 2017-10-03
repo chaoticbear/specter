@@ -6,22 +6,15 @@ use Specter\DB;
 abstract class Model
 {
     protected static $con = 'db';
-    protected $db;
     protected static $tbl;
     protected static $pk = 'id';
+    protected $db;
     protected $mods = [];
     protected $rs = [];
 
-    public function __construct()
-    {
-        $this->db = DB::pdo(static::$con);
-        $this->mods = [];
-    }
-
     protected static function quote($str)
     {
-        $db = DB::pdo(static::$con);
-        switch($db->getAttribute(\PDO::ATTR_DRIVER_NAME)) {
+        switch(DB::type(static::$con)) {
             case 'sqlsql':
             case 'mssql':
             case 'dblib':
@@ -34,6 +27,49 @@ abstract class Model
                 return '"' . $str . '"';
                 break;
         }
+    }
+
+    public static function tbl()
+    {
+        return static::quote(static::$tbl);
+    }
+
+    public static function pk()
+    {
+        return static::quote(static::$pk);
+    }
+
+
+    public static function cols()
+    {
+        foreach (static::pdo(static::$con)
+            ->query('SHOW COLUMNS FROM ' . static::tbl()) as $rw) {
+            var_dump($rw);
+        }
+    }
+
+    public static function one($id)
+    {
+        $db = DB::pdo(static::$con);
+        $stm = $db->prepare('SELECT * FROM ' . static::tbl() . ' WHERE ' .
+            static::pk() . ' = ?');
+        $stm->execute([$id]);
+        return $stm->fetchObject(static::class);
+    }
+
+    public static function del($id)
+    {
+        $db = DB::pdo(static::$con);
+        $stm = $db->prepare('DELETE FROM ' . static::tbl() . ' WHERE '. 
+            static::pk() . ' = ?');
+        $stm->execute([$id]);
+        return $stm->rowCount();
+    }
+
+    public function __construct()
+    {
+        $this->db = DB::pdo(static::$con);
+        $this->mods = [];
     }
 
     public function get($key)
@@ -58,24 +94,6 @@ abstract class Model
         return $this->set($key, $val);
     }
 
-    public static function one($id)
-    {
-        $db = DB::pdo(static::$con);
-        $stm = $db->prepare('SELECT * FROM ' . static::quote(static::$tbl) .
-            ' WHERE ' . static::quote(static::$pk) . ' = ?');
-        $stm->execute([$id]);
-        return $stm->fetchObject(static::class);
-    }
-
-    public static function del($id)
-    {
-        $db = DB::pdo(static::$con);
-        $stm = $db->prepare('DELETE FROM ' . static::quote(static::$tbl) .
-            ' WHERE '. static::quote(static::$pk) . ' = ?');
-        $stm->execute([$id]);
-        return $stm->rowCount();
-    }
-
     public function delete()
     {
         $pk = static::$pk;
@@ -90,8 +108,8 @@ abstract class Model
                 $s .= ',' . static::quote($k) . '=?';
             }
             $s = substr($s,1);
-            $s = 'UPDATE ' . static::quote(static::$tbl) . ' SET ' . $s .
-                ' WHERE ' . static::quote(static::$pk) . ' = ?';
+            $s = 'UPDATE ' . static::tbl() . ' SET ' . $s . ' WHERE ' .
+                static::pk() . ' = ?';
             $p = [];
             foreach ($this->mods as $k => $v) {
                 $p[] = $v;
