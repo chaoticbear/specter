@@ -16,11 +16,12 @@ class View
 
     public function read($file='', $vars='')
     {
+        $_file = $file;
         if (is_array($vars)) {
             extract($vars);
         }
         ob_start();
-        require($this->viewPath . $file);
+        require($this->viewPath . $_file);
         return ob_get_clean();
     }
 }

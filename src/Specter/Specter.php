@@ -148,11 +148,11 @@ class Specter
     public function exception($e)
     {
         ob_end_clean();
-        $vars = ['exception' => $e];
+        $vars = ['e' => $e];
         $this->errorPage('exp', $vars);
     }
 
-    public funciton error($no, $str, $file, $line)
+    public function error($no, $str, $file, $line)
     {
         ob_end_clean();
         $vars = ['no'=>$no, 'str' =>$str, 'file'=>$file, 'line'=>$line];
