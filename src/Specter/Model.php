@@ -221,19 +221,20 @@ abstract class Model
 
     protected static function cascade($id)
     {
+        $me = static::one($id);
         $r = 0;
         $db = DB::pdo(static::$con);
         foreach (static::$many as $rc => $rid) {
-            $st = $db->prepare('DELETE FROM ' . $rc::tbl() .
-                ' WHERE ' . static::quote($rid) . ' = ?');
-            $st->execute([$id]);
-            $r += $st->rowCount();
+            $st = $me->rel($rc);
+            while ($rel = $st->fetch()) {
+                $r += $rel->delete();
+            }
         }
         foreach (static::$one as $rc => $rid) {
-            $st = $db->prepare('DELETE FROM ' . $rc::tbl() .
-                ' WHERE ' . static::quote($rid) . ' = ?');
-            $st->execute([$id]);
-            $r += $st->rowCount();
+            $rel = $me->rel($rc);
+            if (is_object($rel)) {
+                $r += $rel->delete();
+            }
         }
         foreach (static::$btm as $rc => $lc) {
             $st = $db->prepare('DELETE FROM ' . $lc::tbl() .

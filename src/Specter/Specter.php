@@ -55,6 +55,9 @@ class Specter
                 ]
             ];
         }
+        if (!isset($this->settings['url'])) {
+            $this->settings['url'] = 'http://localhost';
+        }
     }
 
     public function get($name)
@@ -162,8 +165,8 @@ class Specter
     public function haunt()
     {
         session_start();
-        set_exception_handler([$this, exception]);
-        set_error_handler([$this, error]);
+        set_exception_handler([$this, 'exception']);
+        set_error_handler([$this, 'error']);
         $this->db = new DB($this);
         $this->route();
     }
