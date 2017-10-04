@@ -96,11 +96,14 @@ class Specter
         $this->errorPage('405');
     }
 
-    private function errorPage($type = '404')
+    private function errorPage($type = '404', $vars = [])
     {
-        http_response_code($type);
+        if ($type === '404' || $type === '405')
+        {
+            http_response_code($type);
+        }
         $view = new View($this);
-        die($view->read($type.'.php'));
+        die($view->read($type.'.php', $vars));
     }
 
     protected function route()
@@ -142,23 +145,26 @@ class Specter
         }
     }
 
+    public function exception($e)
+    {
+        ob_end_clean();
+        $vars = ['exception' => $e];
+        $this->errorPage('exp', $vars);
+    }
+
+    public funciton error($no, $str, $file, $line)
+    {
+        ob_end_clean();
+        $vars = ['no'=>$no, 'str' =>$str, 'file'=>$file, 'line'=>$line];
+        $this->errorPage('err', $vars);
+    }
+
     public function haunt()
     {
         session_start();
+        set_exception_handler([$this, exception]);
+        set_error_handler([$this, error]);
         $this->db = new DB($this);
         $this->route();
-        /*
-        TODO make custom error pages in view to handle this.
-        set_exception_handler('uncaught_exception_handler');
-        function uncaught_exception_handler($e) {
-          ob_end_clean(); //dump out remaining buffered text
-          $vars['message']=$e;
-          die(View::do_fetch(APP_PATH.'errors/exception_uncaught.php',$vars));
-        }
-        function custom_error($msg='') {
-          $vars['msg']=$msg;
-          die(View::do_fetch(APP_PATH.'errors/custom_error.php',$vars));
-        }
-         */
     }
 }
