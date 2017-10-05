@@ -2,7 +2,7 @@
 namespace Specter;
 
 use Dotenv\Dotenv;
-use Specter\View;
+use Specter\Apparition;
 use Specter\DB;
 
 class Specter
@@ -37,11 +37,11 @@ class Specter
 
     public function defaults()
     {
-        if (!isset($this->settings['appPath'])) {
-            $this->settings['appPath'] = '../app/';
+        if (!isset($this->settings['purgatoryPath'])) {
+            $this->settings['purgatoryPath'] = '../purgatory/';
         }
-        if (!isset($this->settings['viewPath'])) {
-            $this->settings['viewPath'] = '../views/';
+        if (!isset($this->settings['apparitionPath'])) {
+            $this->settings['apparitionPath'] = '../apparitions/';
         }
         if (!isset($this->settings['webBase'])) {
             $this->settings['webBase'] = '/';
@@ -86,7 +86,6 @@ class Specter
                 return include $file;
             }
         }
-
     }
 
     protected function page404()
@@ -105,8 +104,8 @@ class Specter
         {
             http_response_code($type);
         }
-        $view = new View($this);
-        die($view->read($type.'.php', $vars));
+        $apparition = new Apparition($this);
+        die($apparition->read($type.'.php', $vars));
     }
 
     protected function route()
@@ -134,13 +133,13 @@ class Specter
             if(
                 isset($parts[0])
                 && isset($parts[1])
-                && class_exists('\\App\\Controllers\\' . $parts[0])
-                && method_exists('\\App\\Controllers\\' . $parts[0], $parts[1])
+                && class_exists('\\App\\Spirits\\' . $parts[0])
+                && method_exists('\\App\\Spirits\\' . $parts[0], $parts[1])
             ) {
-                $class = '\\App\\Controllers\\' . $parts[0];
+                $class = '\\App\\Spirits\\' . $parts[0];
                 $method = $parts[1];
-                $controller = new $class($this, $params);
-                echo $controller->$method();
+                $spirit = new $class($this, $params);
+                echo $spirit->$method();
             } else {
                 $this->page404();
             }
