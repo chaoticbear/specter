@@ -43,9 +43,6 @@ class Specter
         if (!isset($this->settings['apparitionPath'])) {
             $this->settings['apparitionPath'] = '../apparitions/';
         }
-        if (!isset($this->settings['webBase'])) {
-            $this->settings['webBase'] = '/';
-        }
         if (!isset($this->settings['dbs'])) {
             $this->settings['dbs'] = [
                 'db' => [
@@ -105,7 +102,7 @@ class Specter
             http_response_code($type);
         }
         $apparition = new Apparition($this);
-        die($apparition->read($type.'.php', $vars));
+        die($apparition->appear($type.'.php', $vars));
     }
 
     protected function route()
@@ -133,10 +130,10 @@ class Specter
             if(
                 isset($parts[0])
                 && isset($parts[1])
-                && class_exists('\\App\\Spirits\\' . $parts[0])
-                && method_exists('\\App\\Spirits\\' . $parts[0], $parts[1])
+                && class_exists('\\Purgatory\\Spirits\\' . $parts[0])
+                && method_exists('\\Purgatory\\Spirits\\' . $parts[0], $parts[1])
             ) {
-                $class = '\\App\\Spirits\\' . $parts[0];
+                $class = '\\Purgatory\\Spirits\\' . $parts[0];
                 $method = $parts[1];
                 $spirit = new $class($this, $params);
                 echo $spirit->$method();
