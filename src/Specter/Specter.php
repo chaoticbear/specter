@@ -102,7 +102,7 @@ class Specter
             http_response_code($type);
         }
         $apparition = new Apparition($this);
-        die($apparition->appear($type.'.php', $vars));
+        die($apparition->appear('errors/' . $type . '.php', $vars));
     }
 
     protected function route()
