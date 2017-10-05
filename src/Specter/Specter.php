@@ -37,8 +37,8 @@ class Specter
 
     public function defaults()
     {
-        if (!isset($this->settings['purgatoryPath'])) {
-            $this->settings['purgatoryPath'] = '../purgatory/';
+        if (!isset($this->settings['graveyardPath'])) {
+            $this->settings['graveyardPath'] = '../graveyard/';
         }
         if (!isset($this->settings['apparitionPath'])) {
             $this->settings['apparitionPath'] = '../apparitions/';
@@ -130,10 +130,10 @@ class Specter
             if(
                 isset($parts[0])
                 && isset($parts[1])
-                && class_exists('\\Purgatory\\Spirits\\' . $parts[0])
-                && method_exists('\\Purgatory\\Spirits\\' . $parts[0], $parts[1])
+                && class_exists('\\Graveyard\\Spirits\\' . $parts[0])
+                && method_exists('\\Graveyard\\Spirits\\' . $parts[0], $parts[1])
             ) {
-                $class = '\\Purgatory\\Spirits\\' . $parts[0];
+                $class = '\\Graveyard\\Spirits\\' . $parts[0];
                 $method = $parts[1];
                 $spirit = new $class($this, $params);
                 echo $spirit->$method();
