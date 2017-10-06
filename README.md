@@ -9,3 +9,4 @@ Make form / html helper class or functions. create in a way that ajax can
 Make sanitize and validations.
 
 
+Might rename this project graveyard or afterlife since the naming theme is diffrent
