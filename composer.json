@@ -1,6 +1,6 @@
 {
     "name": "christopherstuder/specter",
-    "description": "Simple PHP MVC",
+    "description": "Simple PHP Framework",
     "type": "framework",
     "authors": [
         {
