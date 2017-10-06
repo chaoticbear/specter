@@ -74,6 +74,11 @@ abstract class Corpse
         return $st;
     }
 
+    public static function all()
+    {
+        return static::sel('SELECT * FROM ' . static::tbl());
+    }
+
     public static function one($id)
     {
         $db = DB::pdo(static::$con);
