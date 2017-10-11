@@ -2,7 +2,6 @@
 namespace Specter;
 
 use Specter\DB;
-use Respect\Validation\Validator as v;
 
 abstract class Corpse
 {

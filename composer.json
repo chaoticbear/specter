@@ -12,8 +12,7 @@
     "require": {
         "php" : ">=5.5.0",
         "nikic/fast-route": "^1.2",
-        "vlucas/phpdotenv": "^2.4",
-        "respect/validation": "^1.1"
+        "vlucas/phpdotenv": "^2.4"
     },
     "autoload": {
         "psr-4": {
