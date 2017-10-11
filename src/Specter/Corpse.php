@@ -24,14 +24,17 @@ abstract class Corpse
 
     public static function validate($arr = [], $first = false)
     {
-        $r = true;
+        $r = [];
         foreach ($arr as $k => $v) {
-            if(static::validation($k, $v) === false) {
-                $r = false;
+            if(($vr = static::validation($k, $v)) !== true) {
+                $r[$k] = $vr;
                 if ($first === true) {
                     break;
                 }
             }
+        }
+        if (empty($r)) {
+            $r = true;
         }
         return $r;
     }
@@ -78,13 +81,17 @@ abstract class Corpse
         return $r;
     }
 
-    public static function new()
+    public static function new($arr = [])
     {
         $class = static::class;
         $r = new $class;
         $cols = static::cols();
         foreach($cols as $col) {
-            $r->set($col['name'], null);
+            if(isset($arr[$col['name']])) {
+                $r->set($col['name'], $arr[$col['name']]);
+            } else {
+                $r->set($col['name'], null);
+            }
         }
         return $r;
     }
