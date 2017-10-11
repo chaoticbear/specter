@@ -2,6 +2,7 @@
 namespace Specter;
 
 use Specter\DB;
+use Respect\Validation\Validator as v;
 
 abstract class Corpse
 {
@@ -16,6 +17,30 @@ abstract class Corpse
     protected $db;
     protected $mods = [];
     protected $rs = [];
+
+    public static function validation($key, $value)
+    {
+        return true;
+    }
+
+    public static function validate($arr = [], $first = false)
+    {
+        $r = true;
+        foreach ($arr as $k => $v) {
+            if(static::validation($k, $v) === false) {
+                $r = false;
+                if ($first === true) {
+                    break;
+                }
+            }
+        }
+        return $r;
+    }
+
+    public function valid($first = false)
+    {
+        return static::validate($this->rs, $first);
+    }
 
     protected static function quote($str)
     {
