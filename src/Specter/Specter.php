@@ -4,6 +4,7 @@ namespace Specter;
 use Dotenv\Dotenv;
 use Specter\Apparition;
 use Specter\DB;
+use Specter\SpecterSession;
 
 class Specter
 {
@@ -160,6 +161,7 @@ class Specter
 
     public function haunt()
     {
+        SpecterSession::initialize((getenv('SESS_KEY') ?: 'SessKey'), (getenv('SESS_SALT') ?: 'SessSalt'));
         session_start();
         set_exception_handler([$this, 'exception']);
         set_error_handler([$this, 'error']);
