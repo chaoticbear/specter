@@ -103,7 +103,10 @@ class Specter
             http_response_code($type);
         }
         $apparition = new Apparition($this);
-        die($apparition->appear('errors/' . $type . '.php', $vars));
+        ob_start();
+        echo $apparition->appear('errors/' . $type . '.php', $vars);
+        session_write_close();
+        die(ob_get_clean());
     }
 
     protected function route()
@@ -137,7 +140,10 @@ class Specter
                 $class = '\\Graveyard\\Spirits\\' . $parts[0];
                 $method = $parts[1];
                 $spirit = new $class($this, $params);
+                ob_start();
                 echo $spirit->$method();
+                session_write_close();
+                echo ob_get_clean();
             } else {
                 $this->page404();
             }
