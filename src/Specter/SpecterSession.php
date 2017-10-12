@@ -15,7 +15,7 @@ class SpecterSession implements \SessionHandlerInterface
     private $encryptionKeySalt;
 
     public static function initialize($encryptionKey, $encryptionKeySalt) {
-        $handler = new SessionHandler($encryptionKey, $encryptionKeySalt);
+        $handler = new SpecterSession($encryptionKey, $encryptionKeySalt);
         return session_set_save_handler($handler, true);
     }
 

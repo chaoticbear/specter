@@ -161,6 +161,8 @@ class Specter
 
     public function haunt()
     {
+        SpecterSession::$cookieSecure = (bool) (getenv('SESS_HTTPS') ?: true);
+        SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
         SpecterSession::initialize((getenv('SESS_KEY') ?: 'SessKey'), (getenv('SESS_SALT') ?: 'SessSalt'));
         session_start();
         set_exception_handler([$this, 'exception']);
