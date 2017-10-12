@@ -7,6 +7,7 @@ use Specter\Apparition;
 abstract class Spirit
 {
     protected $specter;
+    protected $url;
     protected $layout = 'default';
     protected $params = [];
     protected $post = [];
@@ -15,12 +16,14 @@ abstract class Spirit
     public function __construct(Specter $specter, $params = [])
     {
         $this->specter = $specter;
+        $this->url = $specter->get('url');
         $this->params = $params;
         $this->post = filter_input_array(INPUT_POST, FILTER_SANITIZE_STRING);
         $this->get = filter_input_array(INPUT_GET, FILTER_SANITIZE_STRING);
     }
 
-    protected function render($file, array $vars = []) {
+    protected function render($file, array $vars = [])
+    {
         $r = '';
         $apparition = new Apparition($this->specter);
         $r .= $apparition->appear('layouts/' . $this->layout . '/header.php',
@@ -29,5 +32,11 @@ abstract class Spirit
         $r .= $apparition->appear('layouts/' . $this->layout . '/footer.php',
             $vars);
         return $r;
+    }
+
+    protected function redirect($url)
+    {
+        header('Location: ' . $this->url . $url);
+        exit;
     }
 }

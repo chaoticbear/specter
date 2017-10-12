@@ -137,11 +137,18 @@ class Specter
                 && class_exists('\\Graveyard\\Spirits\\' . $parts[0])
                 && method_exists('\\Graveyard\\Spirits\\' . $parts[0], $parts[1])
             ) {
+                if (!array_key_exists('flash', $_SESSION)) {
+                    $_SESSION['flash'] = [];
+                }
                 $class = '\\Graveyard\\Spirits\\' . $parts[0];
                 $method = $parts[1];
+                $flash = $_SESSION['flash'];
                 $spirit = new $class($this, $params);
                 ob_start();
                 echo $spirit->$method();
+                if ($flash == $_SESSION['flash']) {
+                    $_SESSION['flash'] = [];
+                }
                 session_write_close();
                 echo ob_get_clean();
             } else {
