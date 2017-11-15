@@ -17,6 +17,11 @@ abstract class Corpse
     protected $mods = [];
     protected $rs = [];
 
+    public static function shortName()
+    {
+        return (new \ReflectionClass(static::class))->getShortName();
+    }
+
     public static function validation($key, $value)
     {
         return true;
@@ -27,7 +32,8 @@ abstract class Corpse
         $r = [];
         foreach ($arr as $k => $v) {
             if(($vr = static::validation($k, $v)) !== true) {
-                $r[$k] = $vr;
+                $r[static::shortName()][$k]
+                    = $vr;
                 if ($first === true) {
                     break;
                 }
@@ -81,18 +87,23 @@ abstract class Corpse
         return $r;
     }
 
+    public function populate($arr = [], $override = false)
+    {
+        $cols = static::cols();
+        foreach($cols as $col) {
+            if(isset($arr[$col['name']])) {
+                $this->set($col['name'], $arr[$col['name']]);
+            } elseif($override) {
+                $this->set($col['name'], null);
+            }
+        }
+    }
+
     public static function new($arr = [])
     {
         $class = static::class;
         $r = new $class;
-        $cols = static::cols();
-        foreach($cols as $col) {
-            if(isset($arr[$col['name']])) {
-                $r->set($col['name'], $arr[$col['name']]);
-            } else {
-                $r->set($col['name'], null);
-            }
-        }
+        $r->populate($arr, true);
         return $r;
     }
 
@@ -190,6 +201,7 @@ abstract class Corpse
                 $stm->execute($p);
                 $id = $this->db->lastInsertId();
                 $r = $id;
+                $this->$pk = $id;
             } else {
                 $p = [];
                 foreach ($this->mods as $k => $v) {
