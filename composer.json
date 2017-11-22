@@ -1,11 +1,11 @@
 {
-    "name": "christopherstuder/specter",
+    "name": "chaoticbear/specter",
     "description": "Simple PHP Framework",
     "type": "framework",
     "authors": [
         {
-            "name": "Christopher Studer",
-            "email": "christopher.studer@gmail.com"
+            "name": "Chaotic Bear",
+            "email": "chaoticbear@gmail.com"
         }
     ],
     "minimum-stability": "stable",
