@@ -8,6 +8,7 @@ class Apparition
     protected $specter;
     protected $apparitionPath;
     protected $url;
+    public $title = null;
 
     public function __construct(Specter $specter)
     {
