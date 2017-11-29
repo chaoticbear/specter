@@ -5,6 +5,7 @@ use Dotenv\Dotenv;
 use Specter\Apparition;
 use Specter\DB;
 use Specter\SpecterSession;
+use Specter\Redis;
 
 class Specter
 {
@@ -174,6 +175,7 @@ class Specter
 
     public function haunt()
     {
+        Redis::connect();
         if (getenv('SESS_HTTPS') == "false") {
             SpecterSession::$cookieSecure = false;
         }
