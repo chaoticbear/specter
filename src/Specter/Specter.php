@@ -190,6 +190,8 @@ class Specter
                     static::SPECTER_TOKEN_PREFIX . session_id());
                 if (isset($_SESSION['momento'])
                     && $_SESSION['momento'] != $currentToken) {
+                    unset($_SESSION['momento']);
+                    $_SESSION = [];
                     session_unset();
                     if (ini_get('session.use_cookies')) {
                         $prms = session_get_cookie_params();
@@ -198,11 +200,16 @@ class Specter
                             $prms['httponly']);
                     }
                     session_destroy();
+                    session_start();
                     session_regenerate_id();
+                    //TODO test session info. echo block cookie writes!
+                    //error_log('destroy'.PHP_EOL;
                 } else {
                     if(!isset($_SESSION['momento'])) {
+                        //echo 'Your new<br>'.PHP_EOL;
                         session_regenerate_id();
                     }
+                    //echo 'gen new<br>'.PHP_EOL;
                     $newToken = bin2hex(random_bytes(50));
                     $_SESSION['momento'] = $newToken;
                     Redis::obj()->set(
