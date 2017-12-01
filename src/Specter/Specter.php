@@ -9,6 +9,7 @@ use Specter\Redis;
 
 class Specter
 {
+    const SPECTER_TOKEN_PREFIX = 'specter_token_';
     protected $settings = [];
     public $db;
 
@@ -175,13 +176,41 @@ class Specter
 
     public function haunt()
     {
-        Redis::connect();
-        if (getenv('SESS_HTTPS') == "false") {
-            SpecterSession::$cookieSecure = false;
+        if (getenv('REDIS_OFF') != "true") {
+            Redis::connect();
+            if (getenv('SESS_OFF') != "true") {
+                if (getenv('SESS_HTTPS') == "false") {
+                    SpecterSession::$cookieSecure = false;
+                }
+                SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
+                SpecterSession::initialize((getenv('SESS_KEY') ?: 'SessKey'),
+                    (getenv('SESS_SALT') ?: 'SessSalt'));
+                session_start();
+                $currentToken = Redis::obj()->get(
+                    static::SPECTER_TOKEN_PREFIX . session_id());
+                if (isset($_SESSION['momento'])
+                    && $_SESSION['momento'] != $currentToken) {
+                    session_unset();
+                    if (ini_get('session.use_cookies')) {
+                        $prms = session_get_cookie_params();
+                        setcookie(session_name(), '', time() - 42000,
+                            $prms['path'], $prms['domain'], $prms['secure'],
+                            $prms['httponly']);
+                    }
+                    session_destroy();
+                    session_regenerate_id();
+                } else {
+                    if(!isset($_SESSION['momento'])) {
+                        session_regenerate_id();
+                    }
+                    $newToken = bin2hex(random_bytes(50));
+                    $_SESSION['momento'] = $newToken;
+                    Redis::obj()->set(
+                        static::SPECTER_TOKEN_PREFIX . session_id(),
+                        $newToken);
+                }
+            }
         }
-        SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
-        SpecterSession::initialize((getenv('SESS_KEY') ?: 'SessKey'), (getenv('SESS_SALT') ?: 'SessSalt'));
-        session_start();
         set_exception_handler([$this, 'exception']);
         set_error_handler([$this, 'error']);
         $this->db = new DB($this);
