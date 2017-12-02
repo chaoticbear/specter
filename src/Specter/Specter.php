@@ -4,7 +4,6 @@ namespace Specter;
 use Dotenv\Dotenv;
 use Specter\Apparition;
 use Specter\DB;
-use Specter\SpecterSession;
 use Specter\Redis;
 
 class Specter
@@ -196,14 +195,7 @@ class Specter
     public function session()
     {
         if (getenv('SESS_OFF') != "true") {
-            if (getenv('SESS_HTTPS') == "false") {
-                SpecterSession::$cookieSecure = false;
-            }
-            SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
-            SpecterSession::initialize(
-                (getenv('SESS_KEY') ?: 'SessKey'),
-                (getenv('SESS_SALT') ?: 'SessSalt')
-            );
+            session_name((getenv('SESS_NAME') ?: 'SPECTER'));
             session_start();
             if (
                 getenv('SESS_TIMEOUT_OFF') != "true"
