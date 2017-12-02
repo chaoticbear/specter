@@ -178,7 +178,7 @@ class Specter
         $this->errorPage('err', $vars);
     }
 
-    protected function sessionDestroy()
+    public function sessionDestroy()
     {
         unset($_SESSION['momento']);
         $_SESSION = [];
