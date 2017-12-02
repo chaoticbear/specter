@@ -174,22 +174,29 @@ class Specter
         $this->errorPage('err', $vars);
     }
 
-    public function haunt()
+    public function session()
     {
-        if (getenv('REDIS_OFF') != "true") {
-            Redis::connect();
-            if (getenv('SESS_OFF') != "true") {
-                if (getenv('SESS_HTTPS') == "false") {
-                    SpecterSession::$cookieSecure = false;
-                }
-                SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
-                SpecterSession::initialize((getenv('SESS_KEY') ?: 'SessKey'),
-                    (getenv('SESS_SALT') ?: 'SessSalt'));
-                session_start();
+        if (getenv('SESS_OFF') != "true") {
+            if (getenv('SESS_HTTPS') == "false") {
+                SpecterSession::$cookieSecure = false;
+            }
+            SpecterSession::$cookieName = (getenv('SESS_NAME') ?: 'SDATA');
+            SpecterSession::initialize(
+                (getenv('SESS_KEY') ?: 'SessKey'),
+                (getenv('SESS_SALT') ?: 'SessSalt')
+            );
+            session_start();
+            if (
+                getenv('SESS_TOKENS_OFF') != "true"
+                && getenv("REDIS_OFF") != "true"
+            ) {
                 $currentToken = Redis::obj()->get(
                     static::SPECTER_TOKEN_PREFIX . session_id());
-                if (isset($_SESSION['momento'])
-                    && $_SESSION['momento'] != $currentToken) {
+                if (
+                    !empty($currentToken)
+                    && isset($_SESSION['momento'])
+                    && $_SESSION['momento'] != $currentToken
+                ) {
                     unset($_SESSION['momento']);
                     $_SESSION = [];
                     session_unset();
@@ -200,24 +207,37 @@ class Specter
                             $prms['httponly']);
                     }
                     session_destroy();
-                    session_start();
-                    session_regenerate_id();
-                    //TODO test session info. echo block cookie writes!
-                    //error_log('destroy'.PHP_EOL;
                 } else {
-                    if(!isset($_SESSION['momento'])) {
-                        //echo 'Your new<br>'.PHP_EOL;
+                    if(
+                        empty($currentToken)
+                        || !isset($_SESSION['momento'])
+                    ) {
                         session_regenerate_id();
                     }
-                    //echo 'gen new<br>'.PHP_EOL;
                     $newToken = bin2hex(random_bytes(50));
                     $_SESSION['momento'] = $newToken;
-                    Redis::obj()->set(
+                    Redis::obj()->setEx(
                         static::SPECTER_TOKEN_PREFIX . session_id(),
-                        $newToken);
+                        (getenv('SESS_TTL_SECS') ?: 1800),
+                        $newToken
+                    );
                 }
             }
         }
+
+    }
+
+    public function redis()
+    {
+        if (getenv('REDIS_OFF') != "true") {
+            Redis::connect();
+        }
+    }
+
+    public function haunt()
+    {
+        $this->redis();
+        $this->session();
         set_exception_handler([$this, 'exception']);
         set_error_handler([$this, 'error']);
         $this->db = new DB($this);
