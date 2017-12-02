@@ -98,6 +98,11 @@ class Specter
         $this->errorPage('405');
     }
 
+    protected function pageTimeout()
+    {
+        $this->errorPage('timeout');
+    }
+
     private function errorPage($type = '404', $vars = [])
     {
         if ($type === '404' || $type === '405')
@@ -174,6 +179,20 @@ class Specter
         $this->errorPage('err', $vars);
     }
 
+    protected function sessionDestroy()
+    {
+        unset($_SESSION['momento']);
+        $_SESSION = [];
+        session_unset();
+        if (ini_get('session.use_cookies')) {
+            $prms = session_get_cookie_params();
+            setcookie(session_name(), '', time() - 42000,
+                $prms['path'], $prms['domain'], $prms['secure'],
+                $prms['httponly']);
+        }
+        session_destroy();
+    }
+
     public function session()
     {
         if (getenv('SESS_OFF') != "true") {
@@ -187,6 +206,22 @@ class Specter
             );
             session_start();
             if (
+                getenv('SESS_TIMEOUT_OFF') != "true"
+            ) {
+                if (!isset($_SESSION['death'])) {
+                    $_SESSION['death'] = time()
+                        + (getenv('SESS_TIMEOUT_SECS') ?: 1800);
+                } else {
+                    if ($_SESSION['death'] < time()) {
+                        $this->sessionDestroy();
+                        $this->pageTimeout();
+                    } else {
+                        $_SESSION['death'] = time()
+                            + (getenv('SESS_TIMEOUT_SECS') ?: 1800);
+                    }
+                }
+            }
+            if (
                 getenv('SESS_TOKENS_OFF') != "true"
                 && getenv("REDIS_OFF") != "true"
             ) {
@@ -197,16 +232,7 @@ class Specter
                     && isset($_SESSION['momento'])
                     && $_SESSION['momento'] != $currentToken
                 ) {
-                    unset($_SESSION['momento']);
-                    $_SESSION = [];
-                    session_unset();
-                    if (ini_get('session.use_cookies')) {
-                        $prms = session_get_cookie_params();
-                        setcookie(session_name(), '', time() - 42000,
-                            $prms['path'], $prms['domain'], $prms['secure'],
-                            $prms['httponly']);
-                    }
-                    session_destroy();
+                    $this->sessionDestroy();
                 } else {
                     if(
                         empty($currentToken)
@@ -218,13 +244,12 @@ class Specter
                     $_SESSION['momento'] = $newToken;
                     Redis::obj()->setEx(
                         static::SPECTER_TOKEN_PREFIX . session_id(),
-                        (getenv('SESS_TTL_SECS') ?: 1800),
+                        (getenv('SESS_TTL_SECS') ?: 2700),
                         $newToken
                     );
                 }
             }
         }
-
     }
 
     public function redis()
