@@ -115,12 +115,16 @@ class Specter
         die(ob_get_clean());
     }
 
-    protected function route()
+    protected function route($httpMethod = null, $uri = null)
     {
         //TODO cache this.
         $dispatcher = \FastRoute\simpleDispatcher($this->routes());
-        $httpMethod = $_SERVER['REQUEST_METHOD'];
-        $uri = $_SERVER['REQUEST_URI'];
+        if ($httpMethod === null) {
+            $httpMethod = $_SERVER['REQUEST_METHOD'];
+        }
+        if ($uri === null) {
+            $uri = $_SERVER['REQUEST_URI'];
+        }
         if (false !== $pos = strpos($uri, '?')) {
             $uri = substr($uri, 0, $pos);
         }
@@ -251,13 +255,13 @@ class Specter
         }
     }
 
-    public function haunt()
+    public function haunt($method = null, $uri = null)
     {
         $this->redis();
         $this->session();
         set_exception_handler([$this, 'exception']);
         set_error_handler([$this, 'error']);
         $this->db = new DB($this);
-        $this->route();
+        $this->route($method, $uri);
     }
 }
