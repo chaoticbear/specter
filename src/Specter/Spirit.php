@@ -9,6 +9,7 @@ abstract class Spirit
     protected $specter;
     protected $url;
     protected $title = null;
+    protected $description = null;
     protected $layout = 'default';
     protected $params = [];
     protected $post = [];
@@ -28,6 +29,7 @@ abstract class Spirit
         $r = '';
         $apparition = new Apparition($this->specter);
         $apparition->title = $this->title;
+        $apparition->description = $this->description;
         $r .= $apparition->appear('layouts/' . $this->layout . '/header.php',
             $vars);
         $r .= $apparition->appear($file, $vars);
