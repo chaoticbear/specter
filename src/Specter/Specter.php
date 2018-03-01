@@ -210,7 +210,13 @@ class Specter
                 } else {
                     if ($_SESSION['death'] < time()) {
                         $this->sessionDestroy();
-                        $this->pageTimeout();
+                        $sr = getenv('SESS_TIMEOUT_REDIRECT');
+                        if (!empty($sr)) {
+                            header('Location: ' . $sr);
+                            exit();
+                        } else {
+                            $this->pageTimeout();
+                        }
                     } else {
                         $_SESSION['death'] = time()
                             + (getenv('SESS_TIMEOUT_SECS') ?: 1800);
