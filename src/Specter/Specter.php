@@ -154,13 +154,17 @@ class Specter
                 $method = $parts[1];
                 $flash = $_SESSION['flash'];
                 $spirit = new $class($this, $params);
-                ob_start();
+                if ($httpMethod != 'CAST') {
+                    ob_start();
+                }
                 echo $spirit->$method();
                 if ($flash == $_SESSION['flash']) {
                     $_SESSION['flash'] = [];
                 }
                 session_write_close();
-                echo ob_get_clean();
+                if ($httpMethod != 'CAST') {
+                    echo ob_get_clean();
+                }
             } else {
                 $this->page404();
             }
