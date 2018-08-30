@@ -174,14 +174,18 @@ class Specter
 
     public function exception($e)
     {
-        ob_end_clean();
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
         $vars = ['e' => $e];
         $this->errorPage('exp', $vars);
     }
 
     public function error($no, $str, $file, $line)
     {
-        ob_end_clean();
+        if (ob_get_level()) {
+            ob_end_clean();
+        }
         $vars = ['no'=>$no, 'str' =>$str, 'file'=>$file, 'line'=>$line];
         $this->errorPage('err', $vars);
     }
