@@ -255,7 +255,8 @@ abstract class Corpse
         }
         foreach (static::$btm as $rc => $lc) {
             if ($class === $rc) {
-                return $class::sel('SELECT * FROM ' . $rc::tbl() .
+                return $class::sel('SELECT ' . $rc::tbl() . '.* FROM ' .
+                    $rc::tbl() .
                     ' JOIN ' . $lc::tbl() .
                     ' ON ' . $rc::pk() .'='.
                     $lc::tbl().'.'.static::quote($lc::$belongs[$rc]) .
