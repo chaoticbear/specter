@@ -275,7 +275,9 @@ class Specter
         $this->session();
         set_exception_handler([$this, 'exception']);
         set_error_handler([$this, 'error']);
-        $this->db = new DB($this);
+        if (getenv('DB_OFF') != "true") {
+            $this->db = new DB($this);
+        }
         $this->route($method, $uri);
     }
 }
