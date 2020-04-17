@@ -83,7 +83,7 @@ abstract class Corpse
         switch(DB::type(static::$con)) {
             case 'pgsql':
                 $s = DB::pdo(static::$con)->prepare('SELECT column_name FROM information_schema.columns WHERE table_name = ?');
-                $s->execute(static::$tbl);
+                $s->execute([static::$tbl]);
                 foreach ($s->fetchAll(\PDO::FETCH_ASSOC) as $rw) {
                     $r[] = ['name'=>$rw['column_name']];
                 }
