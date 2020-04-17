@@ -80,9 +80,20 @@ abstract class Corpse
     public static function cols()
     {
         $r = [];
-        foreach (DB::pdo(static::$con)
-            ->query('SHOW COLUMNS FROM ' . static::tbl()) as $rw) {
-            $r[] = ['name'=>$rw['Field']];
+        switch(DB::type(static::$con)) {
+            case 'pgsql':
+                $s = DB::pdo(static::$con)->prepare('SELECT column_name FROM information_schema.columns WHERE table_name = ?');
+                $s->execute(static::$tbl);
+                foreach ($s->fetchAll(\PDO::FETCH_ASSOC) as $rw) {
+                    $r[] = ['name'=>$rw['column_name']];
+                }
+                break;
+            default:
+                foreach (DB::pdo(static::$con)
+                    ->query('SHOW COLUMNS FROM ' . static::tbl()) as $rw) {
+                    $r[] = ['name'=>$rw['Field']];
+                }
+                break;
         }
         return $r;
     }
