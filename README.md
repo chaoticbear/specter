@@ -1,5 +1,14 @@
 # Specter
 
+# Install
+```
+Setup download specter.zip
+unzip specter.zip 
+mv specter/* .
+mv specter/.* .
+rm -fr specter*
+```
+
 # To Dos
 Make init command to make new project file layout.
 
