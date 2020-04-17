@@ -200,7 +200,7 @@ abstract class Corpse
                 $s2 = '';
                 $p = [];
                 foreach ($this->mods as $k => $v) {
-                    if ($this->$pk !== $k) {
+                    if (static::$pk !== $k) {
                         $s .= ',' . static::quote($k);
                         $s2 .= ',?';
                         $p[] = $v;
