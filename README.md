@@ -7,6 +7,7 @@ unzip specter.zip
 mv specter/* .
 mv specter/.* .
 rm -fr specter*
+composer install
 ```
 
 # To Dos
