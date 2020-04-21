@@ -87,17 +87,17 @@ class Specter
         }
     }
 
-    protected function page404()
+    public function page404()
     {
         $this->errorPage('404');
     }
 
-    protected function page405()
+    public function page405()
     {
         $this->errorPage('405');
     }
 
-    protected function pageTimeout()
+    public function pageTimeout()
     {
         $this->errorPage('timeout');
     }
