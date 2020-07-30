@@ -37,6 +37,8 @@ class DB
                 $this->cons[$dbName]['user'],
                 $this->cons[$dbName]['pass']
             );
+            $GLOBALS[self::DB_PREFIX.$dbName]
+                ->setAttribute(\PDO::ATTR_ERRMODE, \PDO::ERRMODE_EXCEPTION);
             $GLOBALS[self::TYPE_PREFIX.$dbName] =
                 $GLOBALS[self::DB_PREFIX.$dbName]
                     ->getAttribute(\PDO::ATTR_DRIVER_NAME);
